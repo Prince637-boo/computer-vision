@@ -7,7 +7,7 @@ import os
 # CONFIGURATION
 # ============================================================
 
-CAMERA_ID = 1
+CAMERA_ID = 0
 MODEL_PATH = "hand_landmarker.task"
 
 WIDTH = 640
