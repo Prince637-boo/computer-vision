@@ -1,84 +1,50 @@
 import cv2
-import time
-from typing import Dict, Any, Optional
 from src.config import CAMERA_ID, FRAME_WIDTH, FRAME_HEIGHT, MODEL_PATH
 from src.vision.camera import CameraStream
 from src.vision.hand_detector import HandDetector
 from src.vision.gestures import GestureAnalyzer, GestureType
-from src.vision.drawer import Visualizer
-from src.core.utils import FPSCounter
-from src.interactor.engine_3d import Scene3DEngine
+from src.interactor.panda_engine import Panda3DEngine
 
 def main():
-    print("Initializing Integrated Vision-3D Pipeline...")
-    
-    # Initialize all modules
+    print("🚀 Démarrage du système Jarvis Hologram AR (Mercedes-Benz)...")
+
+    # 1. Moteur 3D Panda3D
+    app = Panda3DEngine()
+    app.load_car_model("assets/models/mercedes_benz.glb")
+
+    # 2. Pipeline de vision
     camera = CameraStream(CAMERA_ID, FRAME_WIDTH, FRAME_HEIGHT)
     detector = HandDetector(str(MODEL_PATH))
-    gesture_analyzer = GestureAnalyzer(pinch_threshold_pixels=35.0)
-    
-    # Initialize PyVista Scene
-    engine_3d = Scene3DEngine()
-    fps_counter = FPSCounter()
+    gesture_analyzer = GestureAnalyzer()
 
-    print("Pipeline ready. Use PINCH gesture near the object to grab.")
-    print("Press 'Q' on the OpenCV window or Ctrl+C in terminal to quit.")
+    # 3. Tâche de traitement en temps réel
+    def vision_task(task):
+        success, frame = camera.read()
+        if not success or frame is None:
+            return task.cont
 
-    try:
-        while engine_3d.is_interaction_visible():
-            success, frame = camera.read()
-            if not success or frame is None:
-                continue
+        h, w, _ = frame.shape
 
-            h, w, _ = frame.shape
+        # Tracking des mains
+        results = detector.process_frame(frame)
+        hands_landmarks = detector.extract_landmarks(results, w, h)
 
-            # 1. Hand Detection
-            results = detector.process_frame(frame)
-            hands_landmarks = detector.extract_landmarks(results, w, h)
+        is_pinching = False
+        hand_pos = (0.0, 0.0, 0.0)
 
-            # 2. Render Hand Skeleton
-            Visualizer.draw_hands(frame, hands_landmarks)
+        if len(hands_landmarks) > 0:
+            gesture_info = gesture_analyzer.analyze_hand(hands_landmarks[0], w, h)
+            is_pinching = (gesture_info["gesture"] == GestureType.PINCH)
+            hand_pos = gesture_info["normalized_pos"]
 
-            gesture_info: Optional[Dict[str, Any]] = None
-            if len(hands_landmarks) > 0:
-                # Analyze primary hand
-                gesture_info = gesture_analyzer.analyze_hand(hands_landmarks[0], w, h)
-                Visualizer.draw_gesture_info(frame, gesture_info)
+        # Mise à jour AR et interaction 3D
+        app.update_background(frame)
+        app.update_hand_interaction(hand_pos, is_pinching)
 
-            # 3. Process 3D Interaction
-            if gesture_info:
-                engine_3d.update_interaction_point(
-                    gesture_info["normalized_pos"], 
-                    is_active=True
-                )
-                engine_3d.process_grab_logic(
-                    gesture_info["gesture"] == GestureType.PINCH,
-                    gesture_info["normalized_pos"]
-                )
-            else:
-                engine_3d.update_interaction_point((0, 0, 0), is_active=False)
+        return task.cont
 
-            # 4. Update Windows
-            Visualizer.draw_fps(frame, fps_counter.update())
-            cv2.imshow("Prince Vision - Computer Vision Feed", frame)
-            
-            # Update PyVista rendering loop
-            engine_3d.render_update()
-
-            # Break on 'q' key press
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-    except KeyboardInterrupt:
-        print("\n⚠️ Interrupted by user.")
-
-    finally:
-        print("🧹 Cleaning up Vision-3D resources...")
-        engine_3d.close()
-        detector.close()
-        camera.release()
-        cv2.destroyAllWindows()
-        print("✅ Shutdown complete.")
+    app.taskMgr.add(vision_task, "VisionTask")
+    app.run()
 
 if __name__ == "__main__":
     main()

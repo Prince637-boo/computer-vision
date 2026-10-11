@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / "assets" / "models" / "hand_landmarker.task"
 
 # Camera Settings
-CAMERA_ID = 3
+CAMERA_ID = 0
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 FPS_TARGET = 30
