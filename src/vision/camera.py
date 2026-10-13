@@ -1,6 +1,9 @@
 import cv2
 from typing import Optional, Tuple, Union
 
+from src.config import FPS_TARGET
+
+
 class CameraStream:
     """Encapsulates OpenCV camera capture initialization, prioritizing explicit device selection."""
     
@@ -9,7 +12,7 @@ class CameraStream:
         self.height = height
         self.cap = None
 
-        print(f"🔍 Connexion au périphérique vidéo configuré (ID: {device_id})...")
+        print(f"Connecting to configured video device (ID: {device_id})...")
         
         # Test direct du périphérique demandé
         if isinstance(device_id, int):
@@ -19,7 +22,9 @@ class CameraStream:
 
         # Vérification si le périphérique est ouvert et valide
         if not self.cap.isOpened() or self.cap.read()[1] is None:
-            print(f"⚠️ Le périphérique {device_id} n'a pas répondu. Scan automatique des autres caméras...")
+            print(
+                f"Video device {device_id} did not respond. Scanning other cameras..."
+            )
             if self.cap:
                 self.cap.release()
             
@@ -32,17 +37,21 @@ class CameraStream:
                     ret, frame = cap_test.read()
                     if ret and frame is not None:
                         self.cap = cap_test
-                        print(f"✅ Caméra alternative trouvée sur /dev/video{idx}")
+                        print(f"Found an alternative camera at /dev/video{idx}.")
                         break
                     cap_test.release()
 
         if self.cap is None or not self.cap.isOpened():
-            raise RuntimeError("❌ Impossible d'ouvrir une vidéo. Assure-toi que DroidCam est connecté.")
+            raise RuntimeError(
+                "Could not open a video source. Check that the camera is connected."
+            )
 
         # Configuration de la résolution et du format MJPG
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+        self.cap.set(cv2.CAP_PROP_FPS, FPS_TARGET)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     def read(self) -> Tuple[bool, Optional[cv2.typing.MatLike]]:
         if not self.cap or not self.cap.isOpened():

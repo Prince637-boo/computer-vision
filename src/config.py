@@ -3,12 +3,14 @@ from pathlib import Path
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_PATH = BASE_DIR / "assets" / "models" / "hand_landmarker.task"
+CAR_MODEL_PATH = BASE_DIR / "assets" / "models" / "mercedes_benz.glb"
 
 # Camera Settings
-CAMERA_ID = 0
+CAMERA_ID = 3
 FRAME_WIDTH = 640
 FRAME_HEIGHT = 480
 FPS_TARGET = 30
+RENDER_FPS = 60
 
 # Detection Thresholds
 NUM_HANDS = 2
