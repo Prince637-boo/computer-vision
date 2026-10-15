@@ -3,3 +3,4 @@ opencv-python
 mediapipe
 panda3d
 panda3d-gltf
+trimesh
