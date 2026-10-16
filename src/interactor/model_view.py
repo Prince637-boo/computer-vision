@@ -24,6 +24,7 @@ class ModelViewMixin:
             raise RuntimeError(f"The model contains no geometry: {model_file}")
 
         self._ensure_hologram_shader()
+        self._stop_training()
         previous_model = self.car_model
         if self.grabbed_node is not None:
             self._release_grabbed_part()
@@ -36,8 +37,12 @@ class ModelViewMixin:
         pivot.set_hpr(0, 0, 0)
         pivot.set_scale(self.BASE_SCALE)
         self.car_model = pivot
+        self._active_model_definition = self._model_definition_for_path(model_file)
         self._model_name = self._name_for_model_path(model_file)
         self._anchor_position = pivot.get_pos()
+        self.pedestal.reparent_to(pivot)
+        self.pedestal.set_pos(0, 0, -1.8)
+        self.pedestal.show()
         self._target_scale = self.BASE_SCALE
         self._current_scale = self.BASE_SCALE
         self._spin_h = 0.0
@@ -51,6 +56,7 @@ class ModelViewMixin:
         if previous_model is not None:
             previous_model.remove_node()
         self._refresh_model_buttons()
+        self._update_training_button()
         self._show_controls()
 
     def _ensure_hologram_shader(self) -> None:
@@ -83,10 +89,9 @@ class ModelViewMixin:
         model.set_pos(-center * scale)
 
     def _name_for_model_path(self, model_file: Path) -> str:
-        resolved_path = model_file.resolve()
-        for model_id, label, _ in self.MODEL_CATALOG:
-            if self._model_paths.get(model_id) == resolved_path:
-                return label
+        model = self._model_definition_for_path(model_file)
+        if model is not None:
+            return model.label
         return model_file.stem.replace("_", " ").upper()
 
     def select_model(self, model_id: str) -> None:

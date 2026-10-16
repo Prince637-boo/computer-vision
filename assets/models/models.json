@@ -1,0 +1,190 @@
+{
+  "models": [
+    {
+      "id": "vehicle",
+      "label": "MERCEDES 300 SEL AMG",
+      "file": "mercedes_benz.glb",
+      "description": "Modèle 3D d'une Mercedes-Benz 300 SEL AMG.",
+      "parts": [
+        {
+          "match": "MERC_300SEL_ENGINE_LADX",
+          "label": "Moteur",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "MERC_300SEL_CALIPER_LF_LADX",
+          "label": "Étrier de frein",
+          "info": "Composant de frein qui serre le disque pour ralentir la roue.",
+          "explode_axis": [1, 0, 0]
+        },
+        {
+          "match": "DISC",
+          "label": "Disque de frein",
+          "info": "Surface de friction du frein sur laquelle agit l'étrier.",
+          "explode_axis": [1, 0, 0]
+        },
+        {
+          "match": "MERC_300SEL_WHEEL_LF_LADX",
+          "label": "Roue avant gauche",
+          "info": "",
+          "explode_axis": [1, 0, 0]
+        },
+        {
+          "match": "MERC_300SEL_BONNET_LADX",
+          "label": "Capot",
+          "info": "",
+          "explode_axis": [0, 1, 0]
+        },
+        {
+          "match": "MERC_300SEL_BOOT_LADX",
+          "label": "Coffre",
+          "info": "",
+          "explode_axis": [0, -1, 0]
+        },
+        {
+          "match": "MERC_300SEL_BODY_LADX",
+          "label": "Carrosserie",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "MERC_300SEL_CHASSIS_LADX",
+          "label": "Châssis",
+          "info": "",
+          "explode_axis": [0, 0, -1]
+        }
+      ],
+      "training_steps": [
+        "MERC_300SEL_ENGINE_LADX",
+        "MERC_300SEL_CALIPER_LF_LADX",
+        "MERC_300SEL_WHEEL_LF_LADX"
+      ]
+    },
+    {
+      "id": "probe",
+      "label": "CASSINI-HUYGENS",
+      "file": "cassini_huygens.glb",
+      "description": "La sonde Cassini a étudié Saturne, ses anneaux et ses lunes; elle a terminé sa mission en 2017.",
+      "parts": [],
+      "training_steps": []
+    },
+    {
+      "id": "rocket",
+      "label": "SATURN V",
+      "file": "saturn_v.glb",
+      "description": "La Saturn V est le lanceur à trois étages utilisé pour les missions Apollo habitées vers la Lune.",
+      "parts": [
+        {
+          "match": "S-IC",
+          "label": "Premier étage S-IC",
+          "info": "Premier étage du lanceur Saturn V.",
+          "explode_axis": [0, 0, -1]
+        },
+        {
+          "match": "S-II",
+          "label": "Deuxième étage S-II",
+          "info": "Deuxième étage du lanceur Saturn V.",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "S-IV b",
+          "label": "Troisième étage S-IVB",
+          "info": "Troisième étage du lanceur Saturn V.",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "escape tower",
+          "label": "Tour de sauvetage",
+          "info": "Structure destinée à éloigner le module de commande en cas d'urgence au lancement.",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "command moduel",
+          "label": "Module de commande",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "service module",
+          "label": "Module de service",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "lem shroud",
+          "label": "Coiffe du module lunaire",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "fin (print 4)",
+          "label": "Ailette",
+          "info": "",
+          "explode_axis": [1, 0, 0]
+        }
+      ],
+      "training_steps": [
+        "escape tower",
+        "S-IV b",
+        "S-II",
+        "S-IC"
+      ]
+    },
+    {
+      "id": "aircraft",
+      "label": "SOFIA",
+      "file": "sofia.glb",
+      "description": "SOFIA était un observatoire stratosphérique d'astronomie infrarouge installé dans un Boeing 747SP.",
+      "parts": [
+        {
+          "match": "Instrument",
+          "label": "Instrument",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "Left wing",
+          "label": "Aile gauche",
+          "info": "",
+          "explode_axis": [-1, 0, 0]
+        },
+        {
+          "match": "Right wing",
+          "label": "Aile droite",
+          "info": "",
+          "explode_axis": [1, 0, 0]
+        },
+        {
+          "match": "Fuselage top",
+          "label": "Fuselage supérieur",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        },
+        {
+          "match": "Nose section",
+          "label": "Section avant",
+          "info": "",
+          "explode_axis": [0, 1, 0]
+        },
+        {
+          "match": "Tail section",
+          "label": "Section arrière",
+          "info": "",
+          "explode_axis": [0, -1, 0]
+        },
+        {
+          "match": "Telescope cavity",
+          "label": "Ouverture télescope",
+          "info": "",
+          "explode_axis": [0, 0, 1]
+        }
+      ],
+      "training_steps": [
+        "Instrument",
+        "Left wing",
+        "Tail section"
+      ]
+    }
+  ]
+}

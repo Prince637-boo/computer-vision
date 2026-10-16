@@ -7,22 +7,11 @@ from panda3d.core import NodePath, Point3, Vec3
 class ExplosionMixin:
     EXPLOSION_DISTANCE = 2.4
 
-    _EXPLOSION_AXES = {
-        "CALIPER": (1, 0, 0),
-        "DISC": (1, 0, 0),
-        "ENGINE": (0, 0, 1),
-        "WHEEL": (1, 0, 0),
-        "SUSP": (1, 0, 0),
-        "BONNET": (0, 1, 0),
-        "BOOT": (0, -1, 0),
-        "CHASSIS": (0, 0, -1),
-    }
-
     def _index_parts(self, geometry_nodes: List[NodePath]) -> None:
         self.parts_dict.clear()
         for node in geometry_nodes:
             name = node.get_name()
-            if self._part_category(name) is not None:
+            if self._part_definition_for_node(name) is not None:
                 self.parts_dict[f"{name}_{len(self.parts_dict)}"] = node
 
     def _prepare_explosion(self, geometry_nodes: List[NodePath]) -> None:
@@ -50,13 +39,12 @@ class ExplosionMixin:
                 (node, base_pos, node.get_hpr(self.car_model), direction)
             )
 
-    @classmethod
     def _explosion_direction(
-        cls, node_name: str, part_center: Point3, model_center: Vec3
+        self, node_name: str, part_center: Point3, model_center: Vec3
     ) -> Vec3:
-        category = cls._part_category(node_name)
-        if category in cls._EXPLOSION_AXES:
-            direction = Vec3(*cls._EXPLOSION_AXES[category])
+        part = self._part_definition_for_node(node_name)
+        if part is not None:
+            direction = Vec3(*part.explode_axis)
             if direction.x:
                 if abs(part_center.x - model_center.x) > 0.08:
                     direction.x *= 1 if part_center.x > model_center.x else -1

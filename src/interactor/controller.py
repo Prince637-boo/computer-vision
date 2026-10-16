@@ -356,6 +356,8 @@ class ControllerMixin:
             best_part: Optional[NodePath] = None
             min_dist = 2.0
             for part_node in self.parts_dict.values():
+                if part_node.is_hidden():
+                    continue
                 center = part_node.get_bounds().get_center()
                 world_pos = self.render.get_relative_point(part_node, center)
                 distance = (world_pos - target_pos).length()
@@ -364,11 +366,16 @@ class ControllerMixin:
                     best_part = part_node
             if best_part is not None:
                 self.grabbed_node = best_part
+                if self._training_session is not None:
+                    self._on_training_part_pinch(best_part.get_name())
+                    return
                 self.grab_offset = best_part.get_pos(self.render) - target_pos
                 self.grabbed_node.set_color_scale(1.2, 1.55, 1.7, 1.0)
                 self._show_part_details(self.grabbed_node.get_name())
 
         if self.grabbed_node is not None:
+            if self._training_session is not None:
+                return
             self.grabbed_node.set_pos(self.render, target_pos + self.grab_offset)
 
     def _release_grabbed_part(self) -> None:
