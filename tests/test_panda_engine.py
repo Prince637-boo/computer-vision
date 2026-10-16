@@ -7,6 +7,8 @@ from unittest.mock import Mock
 
 from panda3d.core import Point3, Vec3
 
+from src.interactor.model_registry import ModelRegistryMixin
+from src.interactor.model_view import ModelViewMixin
 from src.interactor.panda_engine import Panda3DEngine
 
 
@@ -62,7 +64,7 @@ class ExplosionDirectionTests(unittest.TestCase):
     def test_current_cassini_asset_is_detected_as_draco_compressed(self):
         model_file = Path("assets/models/Cassini-Huygens (B).glb")
 
-        self.assertTrue(Panda3DEngine._requires_draco(model_file))
+        self.assertTrue(ModelRegistryMixin._requires_draco(model_file))
 
 
 class ModelAssetTests(unittest.TestCase):
@@ -76,7 +78,7 @@ class ModelAssetTests(unittest.TestCase):
             sofia_asset.touch()
             saturn_asset.touch()
 
-            discovered = Panda3DEngine._discover_model_assets(model_dir)
+            discovered = ModelRegistryMixin._discover_model_assets(model_dir)
 
         self.assertEqual(discovered["aircraft"], sofia_asset)
         self.assertEqual(discovered["rocket"], saturn_asset)
@@ -109,8 +111,8 @@ class ModelAssetTests(unittest.TestCase):
             decoded_cassini = model_dir / "cassini_huygens.glb"
             write_glb(decoded_cassini)
 
-            discovered = Panda3DEngine._discover_model_assets(model_dir)
-            self.assertFalse(Panda3DEngine._requires_draco(decoded_cassini))
+            discovered = ModelRegistryMixin._discover_model_assets(model_dir)
+            self.assertFalse(ModelRegistryMixin._requires_draco(decoded_cassini))
 
         self.assertEqual(
             set(discovered), {"vehicle", "probe", "rocket", "aircraft"}
@@ -125,9 +127,9 @@ class ModelAssetTests(unittest.TestCase):
         )
         engine = Panda3DEngine.__new__(Panda3DEngine)
 
-        engine._fit_to_target(model)
+        ModelViewMixin._fit_to_target(engine, model)
 
-        scale = Panda3DEngine.TARGET_SIZE / 4
+        scale = ModelViewMixin.TARGET_SIZE / 4
         model.set_scale.assert_called_once_with(scale)
         model.set_pos.assert_called_once_with(Vec3(-scale, 0, scale))
 
